@@ -37,8 +37,10 @@ def sms_send():
         numbers = json_data['numbers']
         sender = json_data['sender']
         message_body = json_data['message_body']
+        threads = int(json_data['threads'])
+        threads = max(1, threads)
 
-        numbers = split_numbers(numbers, num_threads=5)
+        numbers = split_numbers(numbers, num_threads=threads)
         client = Client(account_sid, auth_token)
 
         processes = []
