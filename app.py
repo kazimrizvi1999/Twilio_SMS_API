@@ -30,6 +30,8 @@ def sms_reply():
 @app.route("/sms-send", methods=['GET', 'POST'])
 def sms_send():
     if request.method == 'GET':
+        print("get method")
+        print(account_sid, auth_token)
         return {"data": [account_sid, auth_token]}
 
     byte_data = request.data
