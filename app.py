@@ -27,8 +27,10 @@ def sms_reply():
 
     return Response(str(resp), mimetype="application/xml")
 
-@app.route("/sms-send", methods=['POST'])
+@app.route("/sms-send", methods=['GET', 'POST'])
 def sms_send():
+    if request.method == 'GET':
+        return {"data": [account_sid, auth_token]}
 
     byte_data = request.data
     data = byte_data.decode('utf-8').replace("'", '"')
