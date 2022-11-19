@@ -1,11 +1,10 @@
-import mimetypes
 from flask import Flask, Response, request
-import json
 from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
 import os
 from dotenv import load_dotenv
-import time
+import multiprocessing
+from utils import *
 
 app = Flask(__name__)
 
@@ -30,29 +29,43 @@ def sms_reply():
 @app.route("/sms-send", methods=['GET', 'POST'])
 def sms_send():
     if request.method == 'GET':
-        print("get method")
-        print(account_sid, auth_token)
-        return {"data": [account_sid, auth_token]}
+        return {"message:" "Use post request to send sms"}
 
-    byte_data = request.data
-    data = byte_data.decode('utf-8').replace("'", '"')
-    json_data = json.loads(data)
+    elif request.method == 'POST':
+        json_data = preprocess_data(request.data)
 
-    numbers = json_data['numbers']
-    sender = json_data['sender']
-    message_body = json_data['message_body']
-    
-    client = Client(account_sid, auth_token)
+        numbers = json_data['numbers']
+        sender = json_data['sender']
+        message_body = json_data['message_body']
 
-    for number in numbers:
-        message = client.messages \
-        .create(
-            body=message_body,
-            from_=sender,
-            to=number
-        )
-        print(message.sid)
-    return {"status": 200}
+        numbers = split_numbers(numbers, num_threads=5)
+        client = Client(account_sid, auth_token)
+
+        processes = []
+
+        for i, chunk in enumerate(numbers):
+            p = multiprocessing.Process(
+                target=launch_sms,
+                args=(
+                    client,
+                    chunk,
+                    message_body,
+                    sender,
+                    i+1
+                )
+            )
+            processes.append(p)
+        
+        print(f"Total Processes: {len(processes)}")
+        for process in processes:
+            process.start()
+        
+        for process in processes:
+            process.join()
+
+        print("ALL MESSAGES SENT!")        
+        return {"status": 200}
+
 
 if __name__ == "__main__":
     app.run()
