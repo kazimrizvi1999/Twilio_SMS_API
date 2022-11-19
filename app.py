@@ -48,6 +48,7 @@ def sms_send():
             to=number
         )
         print(message.sid)
+    return {"status": 200}
 
 if __name__ == "__main__":
     app.run()
