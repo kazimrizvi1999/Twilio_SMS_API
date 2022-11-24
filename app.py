@@ -36,6 +36,7 @@ def sms_send():
 
         numbers = json_data['numbers']
         numbers=validate(numbers)
+        print(numbers)
         sender = json_data['sender']
         message_body = json_data['message_body']
         threads = int(json_data['threads'])
