@@ -1,5 +1,18 @@
 import json
 
+def validate(numbers):
+    verified_nums=[]
+    for i in numbers:
+        if len(i)==12 and i.startswith('+'):
+            verified_nums.append(i)
+    return verified_nums
+
+# dummy_nums=['+143626366223','+1264728487363764376476','+12345678901','+098276453215','123457132341']
+# a=validate(dummy_nums)
+# print(a)
+
+
+
 def split_numbers(arr, num_threads = 5):
     chunk_size = len(arr)//num_threads
     split_numbers = []
